@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useSmartMoney } from "@/context/SmartMoneyContext";
-import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs";
+type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs" | "fraud";
 
 interface AppLayoutProps {
   activePage: Page;
@@ -17,6 +17,7 @@ const navItems: { id: Page; label: string; icon: React.ElementType; roles: strin
   { id: "wallet", label: "Smart Wallet", icon: Wallet, roles: ["user"] },
   { id: "payment", label: "Payment Engine", icon: CreditCard, roles: ["user"] },
   { id: "logs", label: "Transaction Log", icon: FileText, roles: ["admin", "user", "vendor"] },
+  { id: "fraud", label: "Fraud Simulation", icon: ShieldAlert, roles: ["admin"] },
 ];
 
 const AppLayout: React.FC<AppLayoutProps> = ({ activePage, onNavigate, children }) => {
