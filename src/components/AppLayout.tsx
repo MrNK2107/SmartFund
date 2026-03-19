@@ -3,7 +3,7 @@ import { useSmartMoney } from "@/context/SmartMoneyContext";
 import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs";
+type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs" | "fraud";
 
 interface AppLayoutProps {
   activePage: Page;
