@@ -17,6 +17,7 @@ const navItems: { id: Page; label: string; icon: React.ElementType; roles: strin
   { id: "wallet", label: "Smart Wallet", icon: Wallet, roles: ["user"] },
   { id: "payment", label: "Payment Engine", icon: CreditCard, roles: ["user"] },
   { id: "logs", label: "Transaction Log", icon: FileText, roles: ["admin", "user", "vendor"] },
+  { id: "fraud", label: "Fraud Simulation", icon: ShieldAlert, roles: ["admin"] },
 ];
 
 const AppLayout: React.FC<AppLayoutProps> = ({ activePage, onNavigate, children }) => {
