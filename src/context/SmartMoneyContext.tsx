@@ -13,6 +13,7 @@ export interface FundRule {
   category: string;
   expiry: string; // ISO date
   maxUsage: number;
+  maxAmount: number;
 }
 
 export interface SmartFund {
@@ -34,6 +35,7 @@ export interface Transaction {
   reason: string;
   timestamp: string;
   ruleChecks: RuleCheck[];
+  hash?: string;
 }
 
 export interface RuleCheck {
@@ -49,14 +51,18 @@ interface SmartMoneyContextType {
   funds: SmartFund[];
   transactions: Transaction[];
   createFund: (fund: Omit<SmartFund, "id" | "createdAt" | "remainingBalance">) => void;
+  deposit: (fundId: string, amount: number) => void;
   attemptPayment: (fundId: string, receiverName: string, amount: number) => Transaction;
+  forceExpire: (fundId: string) => void;
+  updateTransaction: (txId: string, hash: string) => void;
 }
 
 const DEMO_USERS: AppUser[] = [
   { id: "admin-1", name: "Admin Controller", role: "admin" },
-  { id: "user-1", name: "Rahul Sharma", role: "user" },
-  { id: "vendor-1", name: "Landlord (Mr. Patel)", role: "vendor" },
-  { id: "vendor-2", name: "Friend (Amit)", role: "vendor" },
+  { id: "user-1", name: "Demo User", role: "user" },
+  { id: "vendor-1", name: "0xFoodVendor", role: "vendor" },
+  { id: "vendor-2", name: "0xLandlordWallet", role: "vendor" },
+  { id: "vendor-3", name: "Unknown Person", role: "vendor" },
 ];
 
 const SmartMoneyContext = createContext<SmartMoneyContextType | null>(null);
@@ -69,21 +75,7 @@ export const useSmartMoney = () => {
 
 export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<AppUser>(DEMO_USERS[0]);
-  const [funds, setFunds] = useState<SmartFund[]>([
-    {
-      id: "fund-1",
-      amount: 5000,
-      remainingBalance: 5000,
-      ownerId: "user-1",
-      rules: {
-        allowedReceiver: "Landlord (Mr. Patel)",
-        category: "rent",
-        expiry: new Date(Date.now() + 30 * 86400000).toISOString(),
-        maxUsage: 1,
-      },
-      createdAt: new Date().toISOString(),
-    },
-  ]);
+  const [funds, setFunds] = useState<SmartFund[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const createFund = useCallback((fund: Omit<SmartFund, "id" | "createdAt" | "remainingBalance">) => {
@@ -94,6 +86,18 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       createdAt: new Date().toISOString(),
     };
     setFunds((prev) => [...prev, newFund]);
+  }, []);
+
+  const deposit = useCallback((fundId: string, amount: number) => {
+    setFunds((prev) => prev.map((f) => 
+      f.id === fundId ? { ...f, amount: f.amount + amount, remainingBalance: f.remainingBalance + amount } : f
+    ));
+  }, []);
+
+  const forceExpire = useCallback((fundId: string) => {
+    setFunds((prev) => prev.map((f) => 
+      f.id === fundId ? { ...f, rules: { ...f.rules, expiry: new Date(Date.now() - 100000).toISOString() } } : f
+    ));
   }, []);
 
   const attemptPayment = useCallback(
@@ -110,17 +114,28 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         rule: "Allowed Receiver",
         passed: receiverMatch,
         detail: receiverMatch
-          ? `Receiver "${receiverName}" matches allowed receiver`
-          : `Receiver "${receiverName}" not allowed. Expected: "${fund.rules.allowedReceiver}"`,
+          ? `Receiver "${receiverName}" matches allowed vendor`
+          : `Vendor not approved. Expected: "${fund.rules.allowedReceiver}"`,
       });
       if (!receiverMatch) allPassed = false;
+
+      // Check max amount
+      const validAmount = amount <= fund.rules.maxAmount;
+      checks.push({
+        rule: "Max Tx Amount",
+        passed: validAmount,
+        detail: validAmount
+          ? `Amount ${amount} does not exceed transaction max (${fund.rules.maxAmount})`
+          : `Amount exceeds maximum allowed (${fund.rules.maxAmount})`,
+      });
+      if (!validAmount) allPassed = false;
 
       // Check expiry
       const notExpired = new Date(fund.rules.expiry) > new Date();
       checks.push({
         rule: "Expiry Check",
         passed: notExpired,
-        detail: notExpired ? "Fund has not expired" : "Fund has expired",
+        detail: notExpired ? "Fund has not expired" : "Fund expired",
       });
       if (!notExpired) allPassed = false;
 
@@ -131,7 +146,7 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         passed: hasBalance,
         detail: hasBalance
           ? `Sufficient balance: ₹${fund.remainingBalance}`
-          : `Insufficient balance: ₹${fund.remainingBalance} < ₹${amount}`,
+          : `Insufficient fund balance: ₹${fund.remainingBalance} < ₹${amount}`,
       });
       if (!hasBalance) allPassed = false;
 
@@ -143,7 +158,7 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         passed: withinUsage,
         detail: withinUsage
           ? `Usage ${usageCount}/${fund.rules.maxUsage}`
-          : `Max usage reached: ${usageCount}/${fund.rules.maxUsage}`,
+          : `Max usage limit reached: ${usageCount}/${fund.rules.maxUsage}`,
       });
       if (!withinUsage) allPassed = false;
 
@@ -155,7 +170,7 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         fundId,
         status: allPassed ? "approved" : "rejected",
         reason: allPassed
-          ? `Smart Contract Approved — ₹${amount} transferred to ${receiverName} via UPI`
+          ? `Smart Contract Approved — ${amount} USDC transferred to ${receiverName}`
           : `Transaction Rejected by Contract — ${checks.find((c) => !c.passed)?.detail}`,
         timestamp: new Date().toISOString(),
         ruleChecks: checks,
@@ -176,9 +191,15 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     [funds, transactions, currentUser]
   );
 
+  const updateTransaction = useCallback((txId: string, hash: string) => {
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === txId ? { ...t, hash, reason: `${t.reason} (Tx Hash: ${hash})` } : t))
+    );
+  }, []);
+
   return (
     <SmartMoneyContext.Provider
-      value={{ currentUser, setCurrentUser, users: DEMO_USERS, funds, transactions, createFund, attemptPayment }}
+      value={{ currentUser, setCurrentUser, users: DEMO_USERS, funds, transactions, createFund, deposit, forceExpire, attemptPayment, updateTransaction }}
     >
       {children}
     </SmartMoneyContext.Provider>
