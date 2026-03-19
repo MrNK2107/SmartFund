@@ -1,16 +1,33 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import React, { useState } from "react";
+import { SmartMoneyProvider } from "@/context/SmartMoneyContext";
+import AppLayout from "@/components/AppLayout";
+import Dashboard from "@/pages/Dashboard";
+import FundCreator from "@/pages/FundCreator";
+import SmartWallet from "@/pages/SmartWallet";
+import PaymentEngine from "@/pages/PaymentEngine";
+import TransactionLog from "@/pages/TransactionLog";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
-  return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
-  );
+type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs";
+
+const pages: Record<Page, React.FC> = {
+  dashboard: Dashboard,
+  creator: FundCreator,
+  wallet: SmartWallet,
+  payment: PaymentEngine,
+  logs: TransactionLog,
 };
 
-const Index = PlaceholderIndex;
+const Index: React.FC = () => {
+  const [activePage, setActivePage] = useState<Page>("dashboard");
+  const ActiveComponent = pages[activePage];
+
+  return (
+    <SmartMoneyProvider>
+      <AppLayout activePage={activePage} onNavigate={setActivePage}>
+        <ActiveComponent />
+      </AppLayout>
+    </SmartMoneyProvider>
+  );
+};
 
 export default Index;
