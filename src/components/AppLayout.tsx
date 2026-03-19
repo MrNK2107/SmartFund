@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSmartMoney } from "@/context/SmartMoneyContext";
-import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Page = "dashboard" | "creator" | "wallet" | "payment" | "logs";
