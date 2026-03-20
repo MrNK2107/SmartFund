@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { LayoutDashboard, PlusCircle, Wallet, CreditCard, FileText, Shield, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +21,7 @@ const navItems: { id: Page; label: string; icon: React.ElementType; roles: strin
 ];
 
 const AppLayout: React.FC<AppLayoutProps> = ({ activePage, onNavigate, children }) => {
-  const { currentUser, setCurrentUser, users } = useSmartMoney();
+  const { currentUser, setCurrentUser, users } = useSmartFund();
   const [collapsed, setCollapsed] = useState(false);
 
   const visibleNav = navItems.filter((item) => item.roles.includes(currentUser.role));
@@ -37,7 +37,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ activePage, onNavigate, children 
       >
         <div className="flex items-center gap-2 px-4 py-5 border-b border-sidebar-border">
           <Shield className="h-6 w-6 text-sidebar-primary shrink-0" />
-          {!collapsed && <span className="font-semibold text-sm tracking-tight">SmartMoney OS</span>}
+          {!collapsed && <span className="font-semibold text-sm tracking-tight">SmartFund</span>}
         </div>
 
         <nav className="flex-1 py-4 space-y-1 px-2">

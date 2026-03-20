@@ -1,9 +1,9 @@
 import React from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { CheckCircle2, XCircle } from "lucide-react";
 
 const TransactionLog: React.FC = () => {
-  const { transactions } = useSmartMoney();
+  const { transactions } = useSmartFund();
 
   return (
     <div>

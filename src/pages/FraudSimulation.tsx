@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { ShieldAlert, Zap, AlertTriangle, CheckCircle2, XCircle, Activity } from "lucide-react";
 
 interface FraudAttempt {
@@ -63,7 +63,7 @@ const riskBgColors: Record<string, string> = {
 };
 
 const FraudSimulation: React.FC = () => {
-  const { funds, attemptPayment, transactions } = useSmartMoney();
+  const { funds, attemptPayment, transactions } = useSmartFund();
   const [simResults, setSimResults] = useState<
     { attempt: FraudAttempt; txStatus: "approved" | "rejected"; reason: string }[]
   >([]);

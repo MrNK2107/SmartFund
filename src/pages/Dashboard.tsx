@@ -1,9 +1,9 @@
 import React from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { Wallet, ShieldCheck, AlertTriangle, ArrowRightLeft } from "lucide-react";
 
 const Dashboard: React.FC = () => {
-  const { funds, transactions, currentUser } = useSmartMoney();
+  const { funds, transactions, currentUser } = useSmartFund();
 
   const userFunds = currentUser.role === "admin" ? funds : funds.filter((f) => f.ownerId === currentUser.id);
   const totalFunds = userFunds.reduce((s, f) => s + f.amount, 0);

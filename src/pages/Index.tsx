@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SmartMoneyProvider } from "@/context/SmartMoneyContext";
+import { SmartFundProvider } from "@/context/SmartFundContext";
 import AppLayout from "@/components/AppLayout";
 import Dashboard from "@/pages/Dashboard";
 import FundCreator from "@/pages/FundCreator";
@@ -24,11 +24,11 @@ const Index: React.FC = () => {
   const ActiveComponent = pages[activePage];
 
   return (
-    <SmartMoneyProvider>
+    <SmartFundProvider>
       <AppLayout activePage={activePage} onNavigate={setActivePage}>
         <ActiveComponent />
       </AppLayout>
-    </SmartMoneyProvider>
+    </SmartFundProvider>
   );
 };
 

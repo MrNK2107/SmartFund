@@ -44,7 +44,7 @@ export interface RuleCheck {
   detail: string;
 }
 
-interface SmartMoneyContextType {
+interface SmartFundContextType {
   currentUser: AppUser;
   setCurrentUser: (user: AppUser) => void;
   users: AppUser[];
@@ -65,15 +65,15 @@ const DEMO_USERS: AppUser[] = [
   { id: "vendor-3", name: "Unknown Person", role: "vendor" },
 ];
 
-const SmartMoneyContext = createContext<SmartMoneyContextType | null>(null);
+const SmartFundContext = createContext<SmartFundContextType | null>(null);
 
-export const useSmartMoney = () => {
-  const ctx = useContext(SmartMoneyContext);
-  if (!ctx) throw new Error("useSmartMoney must be used within SmartMoneyProvider");
+export const useSmartFund = () => {
+  const ctx = useContext(SmartFundContext);
+  if (!ctx) throw new Error("useSmartFund must be used within SmartFundProvider");
   return ctx;
 };
 
-export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const SmartFundProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<AppUser>(DEMO_USERS[0]);
   const [funds, setFunds] = useState<SmartFund[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -198,10 +198,10 @@ export const SmartMoneyProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, []);
 
   return (
-    <SmartMoneyContext.Provider
+    <SmartFundContext.Provider
       value={{ currentUser, setCurrentUser, users: DEMO_USERS, funds, transactions, createFund, deposit, forceExpire, attemptPayment, updateTransaction }}
     >
       {children}
-    </SmartMoneyContext.Provider>
+    </SmartFundContext.Provider>
   );
 };

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { Lock, Clock, User, Tag, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const SmartWallet: React.FC = () => {
-  const { funds, currentUser, deposit } = useSmartMoney();
+  const { funds, currentUser, deposit } = useSmartFund();
   const userFunds = funds.filter((f) => f.ownerId === currentUser.id);
 
   const [isDepositing, setIsDepositing] = useState<string | null>(null);

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { useSmartMoney } from "@/context/SmartMoneyContext";
+import { useSmartFund } from "@/context/SmartFundContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 const FundCreator: React.FC = () => {
-  const { createFund, users } = useSmartMoney();
+  const { createFund, users } = useSmartFund();
   const [token, setToken] = useState("mUSDC");
   const [maxAmount, setMaxAmount] = useState("100");
   const [category, setCategory] = useState("food");
