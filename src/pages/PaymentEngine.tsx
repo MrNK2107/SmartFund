@@ -17,6 +17,9 @@ const PaymentEngine: React.FC = () => {
   const [isProcessingTx, setIsProcessingTx] = useState(false);
   const [showRazorpay, setShowRazorpay] = useState(false);
   const [pendingTx, setPendingTx] = useState<any>(null);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otpValue, setOtpValue] = useState("");
+  const [showSuccessTick, setShowSuccessTick] = useState(false);
 
   const executePayment = async (fundId: string, rec: string, amt: number) => {
     setReceiver(rec);
@@ -69,14 +72,24 @@ const PaymentEngine: React.FC = () => {
   };
 
   const handleRazorpayConfirm = async () => {
-    // 3. Final Demo step: "Actual payment via internal processor"
+    setOtpStep(true);
+    setOtpValue("");
+  };
+
+  const finalizePaymentWithOtp = () => {
     setIsProcessingTx(true);
     setTimeout(() => {
       setIsProcessingTx(false);
-      setShowRazorpay(false);
-      toast.success("Payment completed successfully!");
-      setResult((prev: any) => prev ? { ...prev, reason: "Actual payment completed via SmartPay Demo." } : null);
-    }, 1500); // slight synthetic delay
+      setShowSuccessTick(true);
+      setTimeout(() => {
+        setShowSuccessTick(false);
+        setShowRazorpay(false);
+        setOtpStep(false);
+        setOtpValue("");
+        toast.success("Payment completed successfully!");
+        setResult((prev: any) => prev ? { ...prev, reason: "Actual payment completed via SmartFund Demo." } : null);
+      }, 2000); // Show full-card tick for 2 seconds
+    }, 1500); // 1.5s Verifying
   };
 
   const handlePay = (e: React.FormEvent) => {
@@ -90,9 +103,24 @@ const PaymentEngine: React.FC = () => {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
         <div className="bg-white rounded-xl shadow-2xl max-w-[400px] w-full max-h-[90vh] overflow-hidden flex flex-col relative animate-in slide-in-from-bottom-8 duration-500 will-change-transform">
           
+          {/* GPay Style Success Overlay */}
+          {showSuccessTick && (
+            <div className="absolute inset-0 z-50 bg-[#1ba672] flex flex-col items-center justify-center animate-in fade-in duration-300">
+               <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-xl animate-in zoom-in spin-in-[0.5turn] duration-500 delay-150 fill-mode-backwards">
+                 <CheckCircle2 className="w-14 h-14 text-[#1ba672]" strokeWidth={3} />
+               </div>
+               <h2 className="text-2xl font-bold text-white tracking-tight animate-in slide-in-from-bottom-4 fade-in duration-500 delay-300 fill-mode-backwards">
+                 Payment Successful
+               </h2>
+               <p className="text-green-100 mt-2 font-medium tracking-wide animate-in slide-in-from-bottom-4 fade-in duration-500 delay-400 fill-mode-backwards">
+                 ₹{(pendingTx.amount * 82).toLocaleString()} paid dynamically
+               </p>
+            </div>
+          )}
+
           {/* Header - Blue gradient like Razorpay */}
           <div className="bg-gradient-to-r from-[#0d1433] to-[#12225a] text-white p-6 pb-10 relative">
-            <button onClick={() => setShowRazorpay(false)} className="absolute right-4 top-4 hover:bg-white/10 p-1 rounded-full transition-colors group">
+            <button onClick={() => { setShowRazorpay(false); setOtpStep(false); }} className="absolute right-4 top-4 hover:bg-white/10 p-1 rounded-full transition-colors group">
               <XCircle className="w-5 h-5 opacity-70 group-hover:opacity-100 transition-opacity" />
             </button>
             
@@ -124,73 +152,119 @@ const PaymentEngine: React.FC = () => {
             <div className="text-gray-500 font-medium tracking-wide text-xs">+91 98765 43210</div>
           </div>
 
-          {/* Payment Methods */}
-          <div className="flex-1 overflow-y-auto px-5 py-6">
-             <h4 className="text-[10px] uppercase font-bold text-gray-400 mb-3 tracking-widest pl-1">Preferred Payment Methods</h4>
-             
-             <div className="space-y-3">
-               <button type="button" disabled className="w-full flex items-center justify-between p-3.5 border rounded-lg border-gray-200 opacity-60 cursor-not-allowed bg-gray-50/50">
-                 <div className="flex items-center gap-4">
-                   <div className="w-10 h-10 bg-white border shadow-sm flex items-center justify-center rounded">
-                     <span className="text-lg grayscale opacity-70">💳</span>
-                   </div>
-                   <div className="text-left">
-                     <p className="font-semibold text-sm text-gray-800">Cards, UPI & More</p>
-                     <p className="text-xs text-gray-500 mt-0.5">Visa, MasterCard, RuPay</p>
-                   </div>
-                 </div>
-               </button>
+          {/* Payment Options or OTP Screen */}
+          <div className="flex-1 overflow-y-auto px-5 py-6 relative">
+            {!otpStep ? (
+              <div className="animate-in fade-in duration-300">
+                 <h4 className="text-[10px] uppercase font-bold text-gray-400 mb-3 tracking-widest pl-1">Preferred Payment Methods</h4>
+                 
+                 <div className="space-y-3">
+                   <button type="button" disabled className="w-full flex items-center justify-between p-3.5 border rounded-lg border-gray-200 opacity-60 cursor-not-allowed bg-gray-50/50">
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 bg-white border shadow-sm flex items-center justify-center rounded">
+                         <span className="text-lg grayscale opacity-70">💳</span>
+                       </div>
+                       <div className="text-left">
+                         <p className="font-semibold text-sm text-gray-800">Cards, UPI & More</p>
+                         <p className="text-xs text-gray-500 mt-0.5">Visa, MasterCard, RuPay</p>
+                       </div>
+                     </div>
+                   </button>
 
-               <button type="button" disabled className="w-full flex items-center justify-between p-3.5 border rounded-lg border-gray-200 opacity-60 cursor-not-allowed bg-gray-50/50">
-                 <div className="flex items-center gap-4">
-                   <div className="w-10 h-10 bg-white border shadow-sm flex items-center justify-center rounded">
-                     <span className="text-lg grayscale opacity-70">📱</span>
-                   </div>
-                   <div className="text-left">
-                     <p className="font-semibold text-sm text-gray-800">UPI</p>
-                     <p className="text-xs text-gray-500 mt-0.5">GPay, PhonePe, Paytm</p>
-                   </div>
-                 </div>
-               </button>
+                   <button type="button" disabled className="w-full flex items-center justify-between p-3.5 border rounded-lg border-gray-200 opacity-60 cursor-not-allowed bg-gray-50/50">
+                     <div className="flex items-center gap-4">
+                       <div className="w-10 h-10 bg-white border shadow-sm flex items-center justify-center rounded">
+                         <span className="text-lg grayscale opacity-70">📱</span>
+                       </div>
+                       <div className="text-left">
+                         <p className="font-semibold text-sm text-gray-800">UPI</p>
+                         <p className="text-xs text-gray-500 mt-0.5">GPay, PhonePe, Paytm</p>
+                       </div>
+                     </div>
+                   </button>
 
-               {/* Web3 / Crypto Method */}
-               <button 
-                  type="button"
-                  onClick={handleRazorpayConfirm}
-                  disabled={isProcessingTx}
-                  className="w-full flex items-center justify-between p-3.5 border-2 rounded-lg border-[#3399cc] bg-blue-50/40 relative overflow-hidden group hover:bg-[#3399cc]/10 transition-colors shadow-sm"
-               >
-                 <div className="flex items-center gap-4 relative z-10">
-                   <div className="w-10 h-10 bg-white border shadow-[0_2px_4px_rgba(51,153,204,0.1)] flex items-center justify-center rounded group-hover:scale-105 transition-transform">
-                     <Zap className="w-5 h-5 text-[#3399cc] fill-[#3399cc]" />
+                   {/* Web3 / Crypto Method */}
+                   <button 
+                      type="button"
+                      onClick={handleRazorpayConfirm}
+                      disabled={isProcessingTx}
+                      className="w-full flex items-center justify-between p-3.5 border-2 rounded-lg border-[#3399cc] bg-blue-50/40 relative overflow-hidden group hover:bg-[#3399cc]/10 transition-colors shadow-sm"
+                   >
+                     <div className="flex items-center gap-4 relative z-10">
+                       <div className="w-10 h-10 bg-white border shadow-[0_2px_4px_rgba(51,153,204,0.1)] flex items-center justify-center rounded group-hover:scale-105 transition-transform">
+                         <Zap className="w-5 h-5 text-[#3399cc] fill-[#3399cc]" />
+                       </div>
+                       <div className="text-left">
+                         <p className="font-bold text-sm text-[#02042b]">Smart Contract Wallet</p>
+                         <p className="text-xs text-[#3399cc] font-semibold mt-0.5 flex items-center gap-1">
+                           <CheckCircle2 className="w-3 h-3" /> Meta Mask Verified
+                         </p>
+                       </div>
+                     </div>
+                     <div className={`relative z-10 bg-[#3399cc] text-white px-3 py-2 rounded text-[11px] font-bold tracking-widest shadow-sm transition-transform flex items-center gap-2 ${isProcessingTx ? "opacity-80" : "group-hover:translate-x-[-2px]"}`}>
+                       {isProcessingTx ? (
+                         <>
+                           <span className="animate-spin w-3 h-3 rounded-full border-2 border-white/30 border-t-white inline-block" />
+                           PROCESSING
+                         </>
+                       ) : "PAY NOW"}
+                     </div>
+                   </button>
+                 </div>
+                 
+                 {pendingTx.hash && (
+                   <div className="mt-8">
+                     <h4 className="text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest pl-1">Transaction Receipt</h4>
+                     <div className="bg-gray-50 border rounded-lg p-3.5 shadow-inner">
+                        <p className="text-[10px] text-gray-500 mb-1 font-semibold uppercase tracking-wider">Blockchain Hash</p>
+                        <p className="text-xs font-mono text-gray-800 break-all leading-relaxed">{pendingTx.hash}</p>
+                     </div>
                    </div>
-                   <div className="text-left">
-                     <p className="font-bold text-sm text-[#02042b]">Smart Contract Wallet</p>
-                     <p className="text-xs text-[#3399cc] font-semibold mt-0.5 flex items-center gap-1">
-                       <CheckCircle2 className="w-3 h-3" /> Meta Mask Verified
-                     </p>
-                   </div>
+                 )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center py-6 px-2 animate-in slide-in-from-right-8 fade-in duration-300">
+                 <div className="w-16 h-16 bg-blue-50 rounded-full flex flex-shrink-0 items-center justify-center mb-5 border border-blue-100 shadow-sm">
+                    <ShieldAlert className="w-8 h-8 text-[#3399cc]" />
                  </div>
-                 <div className={`relative z-10 bg-[#3399cc] text-white px-3 py-2 rounded text-[11px] font-bold tracking-widest shadow-sm transition-transform flex items-center gap-2 ${isProcessingTx ? "opacity-80" : "group-hover:translate-x-[-2px]"}`}>
-                   {isProcessingTx ? (
-                     <>
-                       <span className="animate-spin w-3 h-3 rounded-full border-2 border-white/30 border-t-white inline-block" />
-                       PROCESSING
-                     </>
-                   ) : "PAY NOW"}
+                 <h3 className="text-xl font-bold text-[#02042b] mb-2 tracking-tight">Verify Payment</h3>
+                 <p className="text-xs text-gray-500 mb-8 text-center leading-relaxed">
+                    A confirmation code has been sent to your registered device.
+                 </p>
+                 
+                 <div className="w-full relative flex items-center justify-center">
+                   <Input 
+                     type="text" 
+                     maxLength={6} 
+                     className={`text-center text-3xl tracking-[0.4em] font-mono h-16 w-full bg-gray-50/50 border-gray-200 outline-none focus:ring-1 transition-all rounded-lg ${otpValue.length === 6 ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20' : 'focus:border-[#3399cc] focus:ring-[#3399cc]/20'}`} 
+                     placeholder="------" 
+                     value={otpValue}
+                     onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))} 
+                     autoFocus
+                   />
                  </div>
-               </button>
-             </div>
-             
-             {pendingTx.hash && (
-               <div className="mt-8">
-                 <h4 className="text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-widest pl-1">Transaction Receipt</h4>
-                 <div className="bg-gray-50 border rounded-lg p-3.5 shadow-inner">
-                    <p className="text-[10px] text-gray-500 mb-1 font-semibold uppercase tracking-wider">Blockchain Hash</p>
-                    <p className="text-xs font-mono text-gray-800 break-all leading-relaxed">{pendingTx.hash}</p>
-                 </div>
-               </div>
-             )}
+
+                 <Button 
+                    onClick={finalizePaymentWithOtp}
+                    disabled={otpValue.length !== 6 || isProcessingTx}
+                    className={`w-full hover:bg-[#0d1433] mt-8 py-7 text-sm font-bold tracking-widest uppercase transition-all flex items-center justify-center gap-2 rounded-lg shadow-md ${otpValue.length === 6 ? 'bg-green-600 hover:bg-green-700' : 'bg-[#12225a]'}`}
+                 >
+                    {isProcessingTx ? (
+                       <>
+                         <span className="animate-spin w-4 h-4 rounded-full border-2 border-white/30 border-t-white inline-block" />
+                         VERIFYING OTP...
+                       </>
+                     ) : "CONFIRM & PAY"}
+                 </Button>
+                 
+                 <button 
+                   onClick={() => { setOtpStep(false); setOtpValue(""); }} 
+                   className="text-xs text-gray-400 hover:text-gray-700 font-medium mt-6 transition-colors"
+                 >
+                   ← Cancel & Go Back
+                 </button>
+              </div>
+            )}
           </div>
 
           {/* Footer */}
@@ -247,51 +321,23 @@ const PaymentEngine: React.FC = () => {
             {isProcessingTx ? "Processing on-chain..." : "Execute Smart Payment"}
           </Button>
 
-          {/* HACKATHON DEMO BUTTONS */}
-          <div className="pt-4 border-t space-y-3">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-[#FF007A]">Live Demo Helpers</p>
+          {/* ADMIN TOOLS */}
+          <div className="pt-8 border-t space-y-3 mt-6">
+            <p className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Admin Area</p>
             <div className="grid grid-cols-1 gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="w-full justify-start text-xs border-success/30 hover:bg-success/10 text-success"
-                onClick={() => {
-                  setReceiver("0xFoodVendor");
-                  setAmount("50");
-                  toast.info("Configured Case 1.", { description: "Click Execute Smart Payment below." });
-                }}
-              >
-                <CheckCircle2 className="mr-2 h-4 w-4" /> Load Case 1: Pay Food Vendor 50 mUSDC (SUCCESS)
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full justify-start text-xs border-destructive/30 hover:bg-destructive/10 text-destructive"
-                onClick={() => {
-                  setReceiver("0xLandlordWallet");
-                  setAmount("100");
-                  toast.info("Configured Case 2.", { description: "Click Execute Smart Payment below." });
-                }}
-              >
-                <XCircle className="mr-2 h-4 w-4" /> Load Case 2: Pay Landlord 100 mUSDC (REJECTED)
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="w-full justify-start text-xs border-orange-500/30 hover:bg-orange-500/10 text-orange-500"
+                className="w-full justify-start text-xs border-orange-500/30 hover:bg-orange-500/10 text-orange-500 transition-colors"
                 onClick={() => {
                   if (selectedFund) {
                     forceExpire(selectedFund);
-                    setReceiver("0xFoodVendor");
-                    setAmount("50");
-                    toast.info("Configured Case 3 (Fund Expired).", { description: "Click Execute Smart Payment below." });
+                    toast.info("Selected Fund Expired", { description: "You can now test the expired fund fallback." });
                   }
                 }}
               >
-                <ShieldAlert className="mr-2 h-4 w-4" /> Load Case 3: Simulate Expired Fund (REJECTED)
+                <ShieldAlert className="mr-2 h-4 w-4" /> Force Expire Selected Fund
               </Button>
             </div>
           </div>
