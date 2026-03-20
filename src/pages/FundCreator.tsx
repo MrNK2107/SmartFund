@@ -36,11 +36,12 @@ const FundCreator: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Smart Fund Creator</h1>
-      <p className="text-sm text-muted-foreground mb-6">Demo Step 1: Admin defines rules and creates the fund.</p>
+      <h1 className="text-3xl font-bold mb-8 tracking-tight text-gradient">Smart Fund Creator</h1>
 
-      <form onSubmit={handleCreate} className="max-w-xl space-y-5">
-        <div className="rounded-lg border bg-card p-6 space-y-4">
+      <form onSubmit={handleCreate} className="max-w-xl space-y-8">
+        <div className="glass-card rounded-xl p-8 space-y-5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 transition-colors group-hover:bg-primary/10"></div>
+          <div className="relative z-10 space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label className="text-xs font-medium">Token</Label>
@@ -95,11 +96,12 @@ const FundCreator: React.FC = () => {
               <Label className="text-xs font-medium">Expiry (days)</Label>
               <Input type="number" value={expiryDays} onChange={(e) => setExpiryDays(e.target.value)} className="mt-1" />
             </div>
+            </div>
           </div>
         </div>
 
-        <Button type="submit" className="w-full text-md font-semibold py-6">
-          Create & Deploy Smart Fund
+        <Button type="submit" className="w-full text-md font-bold tracking-widest uppercase py-7 shadow-[0_0_20px_rgba(79,172,254,0.3)] hover:shadow-[0_0_30px_rgba(79,172,254,0.5)] transition-all bg-primary hover:bg-primary/90 text-[color:var(--primary-foreground)]">
+          Deploy Smart Fund
         </Button>
       </form>
     </div>

@@ -47,16 +47,15 @@ const SmartWallet: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Smart Wallet</h1>
-      <p className="text-sm text-muted-foreground mb-6">Demo Step 2: Deposit funds into the allowance.</p>
+      <h1 className="text-3xl font-bold mb-8 tracking-tight text-gradient">Smart Wallet</h1>
 
       {userFunds.length === 0 ? (
-        <div className="rounded-lg border bg-card p-12 text-center">
+        <div className="glass-card rounded-xl p-12 text-center max-w-2xl">
           <Lock className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
           <p className="text-sm text-muted-foreground">No smart funds assigned to you yet.</p>
         </div>
       ) : (
-        <div className="space-y-4 max-w-2xl">
+        <div className="space-y-6 max-w-2xl">
           {userFunds.map((fund) => {
             const pct = fund.amount > 0 ? (fund.remainingBalance / fund.amount) * 100 : 0;
             const expired = new Date(fund.rules.expiry) < new Date();
@@ -65,9 +64,10 @@ const SmartWallet: React.FC = () => {
             return (
               <div
                 key={fund.id}
-                className="rounded-lg border bg-card p-6 hover:scale-[1.01] transition-transform"
+                className="glass-card rounded-xl p-7 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(79,172,254,0.1)] transition-all duration-300 relative overflow-hidden group border border-white/5 hover:border-white/10"
               >
-                <div className="flex items-start justify-between mb-4">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="flex items-start justify-between mb-4 relative z-10">
                   <div>
                     <p className="text-2xl font-semibold">{fund.remainingBalance.toLocaleString()} mUSDC</p>
                     <p className="text-xs text-muted-foreground">
@@ -82,7 +82,7 @@ const SmartWallet: React.FC = () => {
                     >
                       {expired ? "Expired" : "Restricted"}
                     </span>
-                    <Button size="sm" variant="outline" onClick={() => handleDeposit(fund.id)} className="text-xs" disabled={isDepositing === fund.id}>
+                    <Button size="sm" variant="outline" onClick={() => handleDeposit(fund.id)} className="text-xs bg-black/40 hover:bg-black/60 border-white/10 hover:border-primary/50 hover:text-primary transition-all backdrop-blur-md" disabled={isDepositing === fund.id}>
                       <PlusCircle className={`mr-1 h-3 w-3 ${isDepositing === fund.id ? "animate-spin" : ""}`} /> 
                       {isDepositing === fund.id ? "Depositing..." : "Deposit 500 mUSDC"}
                     </Button>

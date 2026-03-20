@@ -113,7 +113,7 @@ const PaymentEngine: React.FC = () => {
                  Payment Successful
                </h2>
                <p className="text-green-100 mt-2 font-medium tracking-wide animate-in slide-in-from-bottom-4 fade-in duration-500 delay-400 fill-mode-backwards">
-                 ₹{(pendingTx.amount * 82).toLocaleString()} paid dynamically
+                 {pendingTx.amount.toLocaleString()} mUSDC paid dynamically
                </p>
             </div>
           )}
@@ -135,9 +135,9 @@ const PaymentEngine: React.FC = () => {
             </div>
             
             <div className="flex items-end justify-between">
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold tracking-tight">₹{(pendingTx.amount * 82).toLocaleString()}</span>
-                <span className="text-white/70 text-sm font-medium">.00</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight">{pendingTx.amount.toLocaleString()}</span>
+                <span className="text-white/70 text-sm font-medium">mUSDC</span>
               </div>
               <div className="text-right">
                  <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold mb-0.5">Amount</p>
@@ -236,7 +236,7 @@ const PaymentEngine: React.FC = () => {
                    <Input 
                      type="text" 
                      maxLength={6} 
-                     className={`text-center text-3xl tracking-[0.4em] font-mono h-16 w-full bg-gray-50/50 border-gray-200 outline-none focus:ring-1 transition-all rounded-lg ${otpValue.length === 6 ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20' : 'focus:border-[#3399cc] focus:ring-[#3399cc]/20'}`} 
+                     className={`text-[#02042b] text-center text-3xl tracking-[0.4em] font-mono h-16 w-full bg-gray-50/50 border-gray-200 outline-none focus:ring-1 transition-all rounded-lg ${otpValue.length === 6 ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20' : 'focus:border-[#3399cc] focus:ring-[#3399cc]/20'}`} 
                      placeholder="------" 
                      value={otpValue}
                      onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))} 
@@ -281,15 +281,16 @@ const PaymentEngine: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Payment Engine</h1>
-      <p className="text-sm text-muted-foreground mb-6">Demo Cases 1, 2, 3: Smart Validation on attempting payments.</p>
+      <h1 className="text-3xl font-bold mb-8 tracking-tight text-gradient">Payment Engine</h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
         {/* Payment Form */}
-        <form onSubmit={handlePay} className="rounded-lg border bg-card p-6 space-y-4">
-          <h3 className="font-semibold text-sm flex items-center gap-2">
-            <Zap className="h-4 w-4 text-primary" /> Transaction Details
-          </h3>
+        <form onSubmit={handlePay} className="glass-card rounded-xl p-8 space-y-5 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-10 -mt-10 transition-colors group-hover:bg-primary/10"></div>
+          <div className="relative z-10 space-y-4">
+            <h3 className="font-bold text-lg flex items-center gap-2 tracking-tight text-white/90 mb-2">
+              <Zap className="h-5 w-5 text-primary" /> Transaction Details
+            </h3>
 
           <div>
             <Label className="text-xs font-medium">Select Fund</Label>
@@ -314,12 +315,13 @@ const PaymentEngine: React.FC = () => {
 
           <div>
             <Label className="text-xs font-medium">Amount (mUSDC)</Label>
-            <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="100" className="mt-1" />
+            <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="100" className="mt-1 bg-black/20 border-white/10" />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isProcessingTx}>
+          <Button type="submit" className="w-full mt-4 text-sm font-bold tracking-widest uppercase py-6 shadow-[0_0_20px_rgba(79,172,254,0.2)] hover:shadow-[0_0_30px_rgba(79,172,254,0.4)] transition-all bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isProcessingTx}>
             {isProcessingTx ? "Processing on-chain..." : "Execute Smart Payment"}
           </Button>
+          </div>
 
           {/* ADMIN TOOLS */}
           <div className="pt-8 border-t space-y-3 mt-6">
@@ -344,14 +346,16 @@ const PaymentEngine: React.FC = () => {
         </form>
 
         {/* Rule Checklist Result */}
-        <div className="rounded-lg border bg-card p-6">
-          <h3 className="font-semibold text-sm mb-4">Smart Contract Validation</h3>
+        <div className="glass-card rounded-xl p-8 relative overflow-hidden group">
+          <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -ml-10 -mb-10 transition-colors group-hover:bg-indigo-500/20"></div>
+          <div className="relative z-10">
+            <h3 className="font-bold text-lg mb-6 tracking-tight text-white/90">Smart Contract Validation</h3>
 
-          {!result ? (
-            <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground text-sm border-2 border-dashed rounded-lg bg-muted/20">
-              <Zap className="h-8 w-8 mb-2 opacity-30" />
-              <p>Execute a payment to see validation results</p>
-            </div>
+            {!result ? (
+              <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground text-sm border-2 border-dashed border-white/10 rounded-xl bg-black/20">
+                <Zap className="h-8 w-8 mb-2 opacity-30 group-hover:opacity-50 transition-opacity" />
+                <p>Execute a payment to see validation results</p>
+              </div>
           ) : (
             <div className="space-y-4">
               {/* Status banner */}
@@ -395,7 +399,8 @@ const PaymentEngine: React.FC = () => {
                 ))}
               </div>
             </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -20,17 +20,18 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-1">Dashboard</h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Money is not transferred unless rules allow it.
+      <h1 className="text-3xl font-bold mb-2 tracking-tight text-gradient">Dashboard</h1>
+      <p className="text-sm text-muted-foreground mb-8">
+        SmartFund OS: Programmable money is not transferred unless rules allow it.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {stats.map((s) => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className="rounded-lg border bg-card p-5">
-              <div className="flex items-center justify-between mb-3">
+            <div key={s.label} className="glass-card rounded-xl p-5 hover:shadow-[0_0_20px_rgba(79,172,254,0.15)] transition-shadow duration-300 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10 transition-colors group-hover:bg-primary/10"></div>
+              <div className="flex items-center justify-between mb-3 relative z-10">
                 <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{s.label}</span>
                 <Icon className={`h-4 w-4 ${s.color}`} />
               </div>
@@ -41,7 +42,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Active Smart Funds */}
-      <h2 className="text-lg font-semibold mb-3">Active Smart Funds</h2>
+      <h2 className="text-xl font-bold mb-4 tracking-tight text-white/90">Active Smart Funds</h2>
       {userFunds.length === 0 ? (
         <p className="text-sm text-muted-foreground">No funds allocated yet.</p>
       ) : (
@@ -52,9 +53,10 @@ const Dashboard: React.FC = () => {
             return (
               <div
                 key={fund.id}
-                className="rounded-lg border bg-card p-5 hover:shadow-md transition-shadow"
+                className="glass-card rounded-xl p-6 hover:shadow-[0_0_25px_rgba(79,172,254,0.1)] transition-all duration-300 relative overflow-hidden group border border-white/5 hover:border-white/10"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="flex items-start justify-between mb-3 relative z-10">
                   <div>
                     <p className="text-xl font-semibold">₹{fund.amount.toLocaleString()}</p>
                     <p className="text-xs text-muted-foreground capitalize">{fund.rules.category} Only</p>
@@ -105,10 +107,10 @@ const Dashboard: React.FC = () => {
       {/* Recent Transactions */}
       {transactions.length > 0 && (
         <>
-          <h2 className="text-lg font-semibold mt-8 mb-3">Recent Transactions</h2>
-          <div className="rounded-lg border overflow-hidden">
+          <h2 className="text-xl font-bold mt-10 mb-4 tracking-tight text-white/90">Recent Transactions</h2>
+          <div className="glass-card rounded-xl overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-muted text-muted-foreground text-xs">
+              <thead className="bg-black/40 text-muted-foreground text-xs uppercase tracking-wider">
                 <tr>
                   <th className="text-left px-4 py-2 font-medium">Receiver</th>
                   <th className="text-left px-4 py-2 font-medium">Amount</th>
